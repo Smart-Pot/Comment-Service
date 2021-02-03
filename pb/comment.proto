@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option go_package = "github.com/Comment-Service/pb";
+
+service CommentService {
+    rpc GetByUser(CommentRequest) returns(CommentResponse) {}
+    rpc GetByPost(CommentRequest) returns(CommentResponse) {}
+    rpc Add(NewCommentRequest) returns(CommentResponse) {}
+    rpc Delete(CommentRequest) returns(CommentResponse) {}
+}
+
+message Comment{
+    string ID = 1;
+    string PostID = 2;
+    string UserID = 3;
+    string Content = 4;
+    repeated string Like = 5;
+    repeated string Dislike = 6;
+    string Date = 7;
+}
+
+message CommentResponse {
+    repeated Comment Comments = 1;
+    int32 Success = 2;
+    string Message = 3;
+}
+
+message CommentRequest {
+    string ID = 1;
+}
+
+message NewCommentRequest {
+    Comment NewComment = 1;
+}
+
