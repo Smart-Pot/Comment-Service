@@ -1,22 +1,31 @@
-package main
+package cmd
 
 import (
-	"commentservice/service"
-	"commentservice/transport"
-	"fmt"
-	"net"
-	"os"
-	"os/signal"
-	"syscall"
-
-	"commentservice/config"
-	"commentservice/endpoints"
-	"commentservice/pb"
-
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
-	"google.golang.org/grpc"
+	"commentservice/server"
+	"flag"
 )
+
+var serverMode = flag.String("mode", "http", "")
+var port = flag.Int("port", 8080, "")
+var secondaryPort = flag.Int("secport", 8081, "")
+
+func Execute() error {
+	flag.Parse()
+
+	// Define server options
+	opt := server.ServerOptions{
+		Port:          *port,
+		Mode:          *serverMode,
+		SecondaryPort: *secondaryPort,
+	}
+
+	// Start server
+	return server.StartServer(opt)
+
+}
+
+/**
+
 
 func main() {
 	config.ReadConfig()
@@ -52,3 +61,7 @@ func main() {
 
 	level.Error(logger).Log("exit", <-errs)
 }
+
+
+
+*/
