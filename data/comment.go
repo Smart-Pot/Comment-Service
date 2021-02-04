@@ -8,13 +8,13 @@ import (
 )
 
 type Comment struct {
-	ID      string
-	PostID  string
-	UserID  string
-	Content string
-	Like    []string
-	Dislike []string
-	Date    string
+	ID      string   `json:"id"`
+	PostID  string   `json:"postId"`
+	UserID  string   `json:"userId"`
+	Content string   `json:"content"`
+	Like    []string `json:"like"`
+	Dislike []string `json:"dislike"`
+	Date    string   `json:"-"`
 }
 
 func findComments(ctx context.Context, key, value string) ([]*Comment, error) {

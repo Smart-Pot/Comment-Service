@@ -5,9 +5,10 @@ import (
 	"commentservice/endpoints"
 	"commentservice/service"
 	"commentservice/transport"
-	"fmt"
+	logg "log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-kit/kit/log"
 )
@@ -23,8 +24,15 @@ func startServer() error {
 	endpoint := endpoints.MakeEndpoints(service)
 	handler := transport.MakeHTTPHandlers(endpoint, logger)
 
+	l := logg.New(os.Stdout, "COMMENT-SERVICE", 0)
 	// Set handler and listen given port
-	http.Handle("/comment", handler)
-	fmt.Println("Server Start Listening to " + config.C.Server.Address)
-	return http.ListenAndServe(config.C.Server.Address, handler)
+	s := http.Server{
+		Addr:         config.C.Server.Address, // configure the bind address
+		Handler:      handler,                 // set the default handler
+		ErrorLog:     l,                       // set the logger for the server
+		ReadTimeout:  5 * time.Second,         // max time to read request from the client
+		WriteTimeout: 10 * time.Second,        // max time to write response to the client
+		IdleTimeout:  120 * time.Second,       // max time for connections using TCP Keep-Alive
+	}
+	return s.ListenAndServe()
 }

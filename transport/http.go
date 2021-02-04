@@ -14,7 +14,7 @@ import (
 )
 
 func MakeHTTPHandlers(e endpoints.Endpoints, logger log.Logger) http.Handler {
-	r := mux.NewRouter()
+	r := mux.NewRouter().PathPrefix("/comment").Subrouter()
 
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
@@ -29,21 +29,21 @@ func MakeHTTPHandlers(e endpoints.Endpoints, logger log.Logger) http.Handler {
 	))
 
 	r.Methods("GET").Path("/post/{id}").Handler(httptransport.NewServer(
-		e.GetByUser,
+		e.GetByPost,
 		decodeCommentHTTPRequest,
 		encodeHTTPResponse,
 		options...,
 	))
 
 	r.Methods("DELETE").Path("/{id}").Handler(httptransport.NewServer(
-		e.GetByUser,
+		e.Delete,
 		decodeCommentHTTPRequest,
 		encodeHTTPResponse,
 		options...,
 	))
 
 	r.Methods("POST").Path("/new").Handler(httptransport.NewServer(
-		e.GetByUser,
+		e.Add,
 		decodeNewCommentHTTPRequest,
 		encodeHTTPResponse,
 		options...,

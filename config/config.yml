@@ -2,7 +2,7 @@ Database:
   User: 
   Password:
   Net: 
-  Addr: 
-  DBName: 
+  Addr: mongodb://localhost:27017
+  DBName: smart-pot
 Server:
   Address: :3000
