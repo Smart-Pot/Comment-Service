@@ -13,6 +13,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const userIDTag = "x-user-id"
+
 func MakeHTTPHandlers(e endpoints.Endpoints, logger log.Logger) http.Handler {
 	r := mux.NewRouter().PathPrefix("/comment").Subrouter()
 
@@ -65,11 +67,10 @@ func decodeCommentHTTPRequest(_ context.Context, r *http.Request) (interface{}, 
 	if !ok {
 		// Handler error
 	}
-
 	return endpoints.CommentRequest{
-		ID: id,
+		ID:     id,
+		UserID: r.Header.Get(userIDTag),
 	}, nil
-
 }
 
 func decodeNewCommentHTTPRequest(_ context.Context, r *http.Request) (interface{}, error) {
@@ -80,6 +81,7 @@ func decodeNewCommentHTTPRequest(_ context.Context, r *http.Request) (interface{
 	}
 	return endpoints.NewCommentRequest{
 		NewComment: c,
+		UserID:     r.Header.Get(userIDTag),
 	}, nil
 
 }

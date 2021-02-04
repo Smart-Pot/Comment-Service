@@ -4,17 +4,24 @@ import (
 	"context"
 	"time"
 
+	"github.com/go-playground/validator"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 type Comment struct {
-	ID      string   `json:"id"`
-	PostID  string   `json:"postId"`
-	UserID  string   `json:"userId"`
-	Content string   `json:"content"`
+	ID      string   `json:"id" `
+	PostID  string   `json:"postId" validate:"required"`
+	UserID  string   `json:"userId" validate:"required"`
+	Content string   `json:"content" validate:"required"`
 	Like    []string `json:"like"`
 	Dislike []string `json:"dislike"`
 	Date    string   `json:"-"`
+}
+
+func (c *Comment) Validate() error {
+	v := validator.New()
+	return v.Struct(c)
 }
 
 func findComments(ctx context.Context, key, value string) ([]*Comment, error) {
@@ -46,26 +53,37 @@ func findComments(ctx context.Context, key, value string) ([]*Comment, error) {
 // GetComments : Find every comment in database
 func GetCommentsByPostID(ctx context.Context, postID string) ([]*Comment, error) {
 	comments, err := findComments(ctx, "postid", postID)
-
 	return comments, err
 }
 
 func GetCommentsByUserID(ctx context.Context, userID string) ([]*Comment, error) {
 	comments, err := findComments(ctx, "userid", userID)
-
 	return comments, err
 }
 
 // AddComment : Add comment to database
 func AddComment(ctx context.Context, c Comment) error {
 	c.Date = time.Now().UTC().String()
+	c.ID = generateID()
 	_, err := collection.InsertOne(ctx, c)
 
 	return err
 }
 
 func DeleteComment(ctx context.Context, commentID string) error {
-	_, err := collection.DeleteOne(ctx, bson.M{"commentid": commentID})
-
+	_, err := collection.DeleteOne(ctx, bson.M{"id": commentID})
 	return err
+}
+
+func GetCommentByID(ctx context.Context, id string) (*Comment, error) {
+	res := collection.FindOne(ctx, bson.M{"id": id})
+	var c Comment
+	if err := res.Decode(&c); err != nil {
+		return nil, err
+	}
+	return &c, nil
+}
+
+func generateID() string {
+	return uuid.NewString()
 }

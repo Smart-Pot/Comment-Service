@@ -21,11 +21,13 @@ type CommentResponse struct {
 }
 
 type CommentRequest struct {
-	ID string
+	ID     string
+	UserID string
 }
 
 type NewCommentRequest struct {
 	NewComment data.Comment
+	UserID     string
 }
 
 func MakeEndpoints(s service.Service) Endpoints {

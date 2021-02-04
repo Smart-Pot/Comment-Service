@@ -36,7 +36,7 @@ func makeGetByPostEndpoint(s service.Service) endpoint.Endpoint {
 func makeAddEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(NewCommentRequest)
-		err := s.Add(ctx, req.NewComment)
+		err := s.Add(ctx, req.UserID, req.NewComment)
 		response := CommentResponse{Comments: nil, Success: 1, Message: "Comments found!"}
 		if err != nil {
 			response.Success = 0
@@ -45,10 +45,11 @@ func makeAddEndpoint(s service.Service) endpoint.Endpoint {
 		return response, nil
 	}
 }
+
 func makeDeleteEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CommentRequest)
-		err := s.Delete(ctx, req.ID)
+		err := s.Delete(ctx, req.UserID, req.ID)
 		response := CommentResponse{Comments: nil, Success: 1, Message: "Comments found!"}
 		if err != nil {
 			response.Success = 0
