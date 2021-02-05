@@ -12,12 +12,18 @@ type Endpoints struct {
 	GetByPost endpoint.Endpoint
 	Add       endpoint.Endpoint
 	Delete    endpoint.Endpoint
+	Vote      endpoint.Endpoint
 }
 
 type CommentResponse struct {
 	Comments []*data.Comment
 	Success  int32
 	Message  string
+}
+
+type VoteRequest struct {
+	UserID    string `json:"userId"`
+	CommentID string `json:"commentId"`
 }
 
 type CommentRequest struct {
@@ -36,5 +42,6 @@ func MakeEndpoints(s service.Service) Endpoints {
 		GetByPost: makeGetByPostEndpoint(s),
 		Add:       makeAddEndpoint(s),
 		Delete:    makeDeleteEndpoint(s),
+		Vote:      makeVoteEndpoint(s),
 	}
 }

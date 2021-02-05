@@ -72,3 +72,21 @@ Comment{
         "success": Number,
         "message" : String
     }
+
+## Vote
+- path: `/comment/vote`
+- method: `POST`
+- params:
+   * Header:
+  
+        |  Name | Description                           | Type   |
+        |:---------:|---------------------------------------|--------|
+        | x-auth-token | authentication token of the user  | String |
+
+- returns:
+    ```js
+    {
+        "comments": Comment[],
+        "success": Number,
+        "message" : String
+    }

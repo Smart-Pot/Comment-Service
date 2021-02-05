@@ -19,12 +19,24 @@ type Service interface {
 	GetByPost(ctx context.Context, postID string) ([]*data.Comment, error)
 	Add(ctx context.Context, userID string, newComment data.Comment) error
 	Delete(ctx context.Context, userID, commentID string) error
+	Vote(ctx context.Context, userID, commentID string) error
 }
 
 func NewService(logger log.Logger) Service {
 	return &service{
 		logger: logger,
 	}
+}
+
+func (s service) Vote(ctx context.Context, userID, commentID string) error {
+	defer func(beginTime time.Time) {
+		level.Info(s.logger).Log(
+			"function", "Vote",
+			"param:userID", userID,
+			"param:commentID", commentID,
+			"took", time.Since(beginTime))
+	}(time.Now())
+	return data.Vote(ctx, userID, commentID)
 }
 
 func (s service) GetByUser(ctx context.Context, userID string) (result []*data.Comment, err error) {

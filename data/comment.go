@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/go-playground/validator"
@@ -15,7 +16,6 @@ type Comment struct {
 	UserID  string   `json:"userId" validate:"required"`
 	Content string   `json:"content" validate:"required"`
 	Like    []string `json:"like"`
-	Dislike []string `json:"dislike"`
 	Date    string   `json:"-"`
 }
 
@@ -65,9 +65,35 @@ func GetCommentsByUserID(ctx context.Context, userID string) ([]*Comment, error)
 func AddComment(ctx context.Context, c Comment) error {
 	c.Date = time.Now().UTC().String()
 	c.ID = generateID()
+	c.Like = []string{}
 	_, err := collection.InsertOne(ctx, c)
 
 	return err
+}
+
+func Vote(ctx context.Context, userID string, commentID string) error {
+	res := collection.FindOne(ctx, bson.M{"id": commentID})
+	var c Comment
+	if err := res.Decode(&c); err != nil {
+		return err
+	}
+	c.Like = updateLikes(userID, c.Like)
+	filter := bson.M{"id": commentID}
+	pushToArray := bson.M{"$set": bson.M{"like": c.Like}}
+	result, err := collection.UpdateOne(ctx, filter, pushToArray)
+	if result.ModifiedCount <= 0 {
+		return errors.New("vote failed!")
+	}
+	return err
+}
+
+func updateLikes(userID string, likes []string) []string {
+	for i, v := range likes {
+		if v == userID {
+			return append(likes[:i], likes[i+1:]...)
+		}
+	}
+	return append(likes, userID)
 }
 
 func DeleteComment(ctx context.Context, commentID string) error {
