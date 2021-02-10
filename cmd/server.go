@@ -34,5 +34,14 @@ func startServer() error {
 		WriteTimeout: 10 * time.Second,        // max time to write response to the client
 		IdleTimeout:  120 * time.Second,       // max time for connections using TCP Keep-Alive
 	}
+	startAMQP(service)
 	return s.ListenAndServe()
+}
+
+func startAMQP(s service.Service) {
+	c, err := endpoints.MakeDeletePostCommentsConsumer()
+	if err != nil {
+		panic(err)
+	}
+	go transport.RunDeletePostCommentsConsumer(c, s)
 }

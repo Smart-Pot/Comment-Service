@@ -7,11 +7,13 @@ import (
 	"log"
 	"os"
 	"os/signal"
+
+	"github.com/Smart-Pot/pkg/adapter/amqp"
 )
 
 func main() {
 	config.ReadConfig()
-
+	amqp.Set("amqp://guest:guest@localhost:5672")
 	data.DatabaseConnection()
 
 	c := make(chan os.Signal, 1)

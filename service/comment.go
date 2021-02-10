@@ -19,6 +19,7 @@ type Service interface {
 	GetByPost(ctx context.Context, postID string) ([]*data.Comment, error)
 	Add(ctx context.Context, userID string, newComment data.Comment) error
 	Delete(ctx context.Context, userID, commentID string) error
+	DeleteMany(ctx context.Context, postID string) error
 	Vote(ctx context.Context, userID, commentID string) error
 }
 
@@ -97,4 +98,23 @@ func (s service) Delete(ctx context.Context, userID, commentID string) error {
 		return errors.New("User can not delete comments of other users")
 	}
 	return data.DeleteComment(ctx, commentID)
+}
+
+func (s service) DeleteMany(ctx context.Context, postID string) error {
+	defer func(beginTime time.Time) {
+		level.Info(s.logger).Log(
+			"function", "DeleteMany",
+			"param:postID", postID,
+			"took", time.Since(beginTime))
+	}(time.Now())
+	var err error
+
+	for x := 0; x < 3; x++ {
+		err = data.DeletePostsComments(ctx, postID)
+		if err == nil {
+			break
+		}
+	}
+
+	return err
 }
