@@ -6,3 +6,7 @@ import "github.com/Smart-Pot/pkg/adapter/amqp"
 func MakeDeletePostCommentsConsumer() (amqp.Consumer, error) {
 	return amqp.MakeConsumer("comment1", "DeletePostComments")
 }
+
+func MakeDeleteUserCommentsConsumer() (amqp.Consumer, error) {
+	return amqp.MakeConsumer("comment2", "DeleteUserComments")
+}

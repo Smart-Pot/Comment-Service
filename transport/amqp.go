@@ -10,6 +10,13 @@ import (
 func RunDeletePostCommentsConsumer(consumer amqp.Consumer, service service.Service) {
 	for {
 		postID := string(consumer.Consume())
-		service.DeleteMany(context.TODO(), postID)
+		service.DeletePostsComments(context.TODO(), postID)
+	}
+}
+func RunDeleteUserCommentsConsumer(consumer amqp.Consumer, service service.Service) {
+	for {
+		userID := string(consumer.Consume())
+		service.DeleteUsersComments(context.TODO(), userID)
+
 	}
 }

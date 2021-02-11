@@ -58,6 +58,14 @@ func DeletePostsComments(ctx context.Context, postID string) error {
 	return nil
 }
 
+func DeleteUsersComments(ctx context.Context, userID string) error {
+	_, err := collection.DeleteMany(ctx, bson.M{"userid": userID})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetComments : Find every comment in database
 func GetCommentsByPostID(ctx context.Context, postID string) ([]*Comment, error) {
 	comments, err := findComments(ctx, "postid", postID)

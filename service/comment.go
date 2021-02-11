@@ -19,7 +19,8 @@ type Service interface {
 	GetByPost(ctx context.Context, postID string) ([]*data.Comment, error)
 	Add(ctx context.Context, userID string, newComment data.Comment) error
 	Delete(ctx context.Context, userID, commentID string) error
-	DeleteMany(ctx context.Context, postID string) error
+	DeletePostsComments(ctx context.Context, postID string) error
+	DeleteUsersComments(ctx context.Context, userID string) error
 	Vote(ctx context.Context, userID, commentID string) error
 }
 
@@ -100,7 +101,26 @@ func (s service) Delete(ctx context.Context, userID, commentID string) error {
 	return data.DeleteComment(ctx, commentID)
 }
 
-func (s service) DeleteMany(ctx context.Context, postID string) error {
+func (s service) DeleteUsersComments(ctx context.Context, userID string) error {
+	defer func(beginTime time.Time) {
+		level.Info(s.logger).Log(
+			"function", "DeleteMany",
+			"param:userID", userID,
+			"took", time.Since(beginTime))
+	}(time.Now())
+	var err error
+
+	for x := 0; x < 3; x++ {
+		err = data.DeleteUsersComments(ctx, userID)
+		if err == nil {
+			break
+		}
+	}
+
+	return err
+}
+
+func (s service) DeletePostsComments(ctx context.Context, postID string) error {
 	defer func(beginTime time.Time) {
 		level.Info(s.logger).Log(
 			"function", "DeleteMany",

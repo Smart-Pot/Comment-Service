@@ -2,17 +2,17 @@ package main
 
 import (
 	"commentservice/cmd"
-	"commentservice/config"
 	"commentservice/data"
 	"log"
 	"os"
 	"os/signal"
 
+	"github.com/Smart-Pot/pkg"
 	"github.com/Smart-Pot/pkg/adapter/amqp"
 )
 
 func main() {
-	config.ReadConfig()
+	pkg.Config.ReadConfig()
 	amqp.Set("amqp://guest:guest@localhost:5672")
 	data.DatabaseConnection()
 
