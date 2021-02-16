@@ -15,11 +15,10 @@ type service struct {
 }
 
 type Service interface {
-	GetByUser(ctx context.Context, userID string) ([]*data.Comment, error)
-	GetByPost(ctx context.Context, postID string) ([]*data.Comment, error)
+	GetByUser(ctx context.Context, userID string, pageNumber, pageSize int) ([]*data.Comment, error)
+	GetByPost(ctx context.Context, postID string, pageNumber, pageSize int) ([]*data.Comment, error)
 	Add(ctx context.Context, userID string, newComment data.Comment) error
 	Delete(ctx context.Context, userID, commentID string) error
-	DeletePostsComments(ctx context.Context, postID string) error
 	DeleteUsersComments(ctx context.Context, userID string) error
 	Vote(ctx context.Context, userID, commentID string) error
 }
@@ -41,27 +40,31 @@ func (s service) Vote(ctx context.Context, userID, commentID string) error {
 	return data.Vote(ctx, userID, commentID)
 }
 
-func (s service) GetByUser(ctx context.Context, userID string) (result []*data.Comment, err error) {
+func (s service) GetByUser(ctx context.Context, userID string, pageNumber, pageSize int) (result []*data.Comment, err error) {
 	defer func(beginTime time.Time) {
 		level.Info(s.logger).Log(
 			"function", "GetByUser",
 			"param:userID", userID,
+			"param:pageNumber", pageNumber,
+			"param:pageSize", pageSize,
 			"result", result,
 			"took", time.Since(beginTime))
 	}(time.Now())
-	result, err = data.GetCommentsByUserID(ctx, userID)
+	result, err = data.GetCommentsByUserID(ctx, userID, pageNumber, pageSize)
 	return result, err
 }
 
-func (s service) GetByPost(ctx context.Context, postID string) (result []*data.Comment, err error) {
+func (s service) GetByPost(ctx context.Context, postID string, pageNumber, pageSize int) (result []*data.Comment, err error) {
 	defer func(beginTime time.Time) {
 		level.Info(s.logger).Log(
 			"function", "GetByPost",
 			"param:postID", postID,
+			"param:pageNumber", pageNumber,
+			"param:pageSize", pageSize,
 			"result", result,
 			"took", time.Since(beginTime))
 	}(time.Now())
-	return data.GetCommentsByPostID(ctx, postID)
+	return data.GetCommentsByPostID(ctx, postID, pageNumber, pageSize)
 }
 
 func (s service) Add(ctx context.Context, userID string, newComment data.Comment) error {
@@ -82,7 +85,6 @@ func (s service) Add(ctx context.Context, userID string, newComment data.Comment
 	return data.AddComment(ctx, newComment)
 }
 
-// TODO: User will able to delete only his/her own comments
 func (s service) Delete(ctx context.Context, userID, commentID string) error {
 	defer func(beginTime time.Time) {
 		level.Info(s.logger).Log(
@@ -112,25 +114,6 @@ func (s service) DeleteUsersComments(ctx context.Context, userID string) error {
 
 	for x := 0; x < 3; x++ {
 		err = data.DeleteUsersComments(ctx, userID)
-		if err == nil {
-			break
-		}
-	}
-
-	return err
-}
-
-func (s service) DeletePostsComments(ctx context.Context, postID string) error {
-	defer func(beginTime time.Time) {
-		level.Info(s.logger).Log(
-			"function", "DeleteMany",
-			"param:postID", postID,
-			"took", time.Since(beginTime))
-	}(time.Now())
-	var err error
-
-	for x := 0; x < 3; x++ {
-		err = data.DeletePostsComments(ctx, postID)
 		if err == nil {
 			break
 		}

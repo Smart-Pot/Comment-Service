@@ -9,8 +9,8 @@ import (
 
 func makeGetByUserEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(CommentRequest)
-		result, err := s.GetByUser(ctx, req.ID)
+		req := request.(CommentsRequest)
+		result, err := s.GetByUser(ctx, req.ID, req.PageNumber, req.PageSize)
 		response := CommentResponse{Comments: result, Success: 1, Message: "Comments found!"}
 		if err != nil {
 			response.Success = 0
@@ -22,8 +22,8 @@ func makeGetByUserEndpoint(s service.Service) endpoint.Endpoint {
 
 func makeGetByPostEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(CommentRequest)
-		result, err := s.GetByPost(ctx, req.ID)
+		req := request.(CommentsRequest)
+		result, err := s.GetByPost(ctx, req.ID, req.PageNumber, req.PageSize)
 		response := CommentResponse{Comments: result, Success: 1, Message: "Comments found!"}
 		if err != nil {
 			response.Success = 0

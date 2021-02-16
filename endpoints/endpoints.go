@@ -26,6 +26,12 @@ type VoteRequest struct {
 	CommentID string `json:"commentId"`
 }
 
+type CommentsRequest struct {
+	ID         string
+	PageNumber int
+	PageSize   int
+}
+
 type CommentRequest struct {
 	ID     string
 	UserID string

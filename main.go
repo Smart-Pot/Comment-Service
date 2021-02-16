@@ -13,7 +13,7 @@ import (
 
 func main() {
 	pkg.Config.ReadConfig()
-	amqp.Set("amqp://guest:guest@localhost:5672")
+	amqp.Set("amqp://guest:guest@rabbitmq:5672")
 	data.DatabaseConnection()
 
 	c := make(chan os.Signal, 1)

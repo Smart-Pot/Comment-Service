@@ -15,7 +15,7 @@ var collection *mongo.Collection
 
 // DatabaseConnection :
 func DatabaseConnection() {
-	fmt.Println("Connected to Database!")
+
 	clientOptions := options.Client().ApplyURI(pkg.Config.Database.Addr)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -28,5 +28,6 @@ func DatabaseConnection() {
 	}
 
 	collection = client.Database(pkg.Config.Database.DBName).Collection("comments")
+	fmt.Println("Connected to Database!")
 
 }

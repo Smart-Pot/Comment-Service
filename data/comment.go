@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Comment struct {
@@ -16,6 +17,7 @@ type Comment struct {
 	UserID  string   `json:"userId" validate:"required"`
 	Content string   `json:"content" validate:"required"`
 	Like    []string `json:"like"`
+	Deleted bool     `json:"deleted"`
 	Date    string   `json:"-"`
 }
 
@@ -24,9 +26,10 @@ func (c *Comment) Validate() error {
 	return v.Struct(c)
 }
 
-func findComments(ctx context.Context, key, value string) ([]*Comment, error) {
+func findComments(ctx context.Context, filter interface{}, opts *options.FindOptions) ([]*Comment, error) {
 	var results []*Comment
-	cur, err := collection.Find(ctx, bson.D{{key, value}})
+
+	cur, err := collection.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -50,30 +53,46 @@ func findComments(ctx context.Context, key, value string) ([]*Comment, error) {
 	return results, err
 }
 
-func DeletePostsComments(ctx context.Context, postID string) error {
-	_, err := collection.DeleteMany(ctx, bson.M{"postid": postID})
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func DeleteUsersComments(ctx context.Context, userID string) error {
-	_, err := collection.DeleteMany(ctx, bson.M{"userid": userID})
+	filter := bson.M{"userid": userID}
+	updatePost := bson.M{"$set": bson.M{"deleted": true}}
+	_, err := collection.UpdateMany(ctx, filter, updatePost)
+
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
 // GetComments : Find every comment in database
-func GetCommentsByPostID(ctx context.Context, postID string) ([]*Comment, error) {
-	comments, err := findComments(ctx, "postid", postID)
+func GetCommentsByPostID(ctx context.Context, postID string, pageNumber, pageSize int) ([]*Comment, error) {
+	skip := int64((pageNumber - 1) * pageSize)
+	limit := int64(pageSize)
+	opts := options.FindOptions{
+		Skip:  &skip,
+		Limit: &limit,
+	}
+	filter := bson.M{
+		"postid":  postID,
+		"deleted": false,
+	}
+	comments, err := findComments(ctx, filter, &opts)
 	return comments, err
 }
 
-func GetCommentsByUserID(ctx context.Context, userID string) ([]*Comment, error) {
-	comments, err := findComments(ctx, "userid", userID)
+func GetCommentsByUserID(ctx context.Context, userID string, pageNumber, pageSize int) ([]*Comment, error) {
+	skip := int64((pageNumber - 1) * pageSize)
+	limit := int64(pageSize)
+	opts := options.FindOptions{
+		Skip:  &skip,
+		Limit: &limit,
+	}
+	filter := bson.M{
+		"userid":  userID,
+		"deleted": false,
+	}
+	comments, err := findComments(ctx, filter, &opts)
 	return comments, err
 }
 
@@ -113,8 +132,20 @@ func updateLikes(userID string, likes []string) []string {
 }
 
 func DeleteComment(ctx context.Context, commentID string) error {
-	_, err := collection.DeleteOne(ctx, bson.M{"id": commentID})
-	return err
+	filter := bson.M{"id": commentID}
+
+	updatePost := bson.M{"$set": bson.M{"deleted": true}}
+
+	res, err := collection.UpdateOne(ctx, filter, updatePost)
+	if err != nil {
+		return err
+	}
+
+	if res.ModifiedCount <= 0 {
+		return errors.New("comment not found")
+	}
+
+	return nil
 }
 
 func GetCommentByID(ctx context.Context, id string) (*Comment, error) {

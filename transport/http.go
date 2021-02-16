@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/transport"
@@ -23,16 +24,16 @@ func MakeHTTPHandlers(e endpoints.Endpoints, logger log.Logger) http.Handler {
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
-	r.Methods("GET").Path("/user/{id}").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/user/{id}/{pagenumber}/{pagesize}").Handler(httptransport.NewServer(
 		e.GetByUser,
-		decodeCommentHTTPRequest,
+		decodeCommentsHTTPRequest,
 		encodeHTTPResponse,
 		options...,
 	))
 
-	r.Methods("GET").Path("/post/{id}").Handler(httptransport.NewServer(
+	r.Methods("GET").Path("/post/{id}/{pagenumber}/{pagesize}").Handler(httptransport.NewServer(
 		e.GetByPost,
-		decodeCommentHTTPRequest,
+		decodeCommentsHTTPRequest,
 		encodeHTTPResponse,
 		options...,
 	))
@@ -67,16 +68,39 @@ func encodeHTTPResponse(ctx context.Context, w http.ResponseWriter, response int
 }
 
 func decodeCommentHTTPRequest(_ context.Context, r *http.Request) (interface{}, error) {
-
 	vars := mux.Vars(r)
-	id, ok := vars["id"]
+	id, idOK := vars["id"]
 
-	if !ok {
-		// Handler error
+	if !idOK {
+		// TODO: handle error
 	}
 	return endpoints.CommentRequest{
 		ID:     id,
 		UserID: r.Header.Get(userIDTag),
+	}, nil
+}
+
+func decodeCommentsHTTPRequest(_ context.Context, r *http.Request) (interface{}, error) {
+
+	vars := mux.Vars(r)
+	id, idOK := vars["id"]
+	pn, pnOK := vars["pagenumber"]
+	ps, psOK := vars["pagesize"]
+
+	pagenumber, err := strconv.Atoi(pn)
+	pagesize, err := strconv.Atoi(ps)
+
+	if err != nil {
+		// TODO: handle error
+	}
+
+	if !idOK || !pnOK || !psOK {
+		// TODO: handle error
+	}
+	return endpoints.CommentsRequest{
+		ID:         id,
+		PageNumber: pagenumber,
+		PageSize:   pagesize,
 	}, nil
 }
 
