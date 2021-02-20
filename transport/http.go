@@ -5,6 +5,7 @@ import (
 	"commentservice/endpoints"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -72,7 +73,7 @@ func decodeCommentHTTPRequest(_ context.Context, r *http.Request) (interface{}, 
 	id, idOK := vars["id"]
 
 	if !idOK {
-		// TODO: handle error
+		return nil, errors.New("missing or wrong argument in request")
 	}
 	return endpoints.CommentRequest{
 		ID:     id,
@@ -88,14 +89,17 @@ func decodeCommentsHTTPRequest(_ context.Context, r *http.Request) (interface{},
 	ps, psOK := vars["pagesize"]
 
 	pagenumber, err := strconv.Atoi(pn)
+	if err != nil {
+		return nil, errors.New("pagesize and pagenumber must be integer")
+	}
 	pagesize, err := strconv.Atoi(ps)
 
 	if err != nil {
-		// TODO: handle error
+		return nil, errors.New("pagesize and pagenumber must be integer")
 	}
 
 	if !idOK || !pnOK || !psOK {
-		// TODO: handle error
+		return nil, errors.New("missing or wrong argument in request")
 	}
 	return endpoints.CommentsRequest{
 		ID:         id,
