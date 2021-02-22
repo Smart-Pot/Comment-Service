@@ -15,6 +15,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var (
+	ErrNotInteger    = errors.New("pagesize and pagenumber must be integer")
+	ErrWrongArgument = errors.New("missing or wrong argument in request")
+)
+
 const userIDTag = "x-user-id"
 
 func MakeHTTPHandlers(e endpoints.Endpoints, logger log.Logger) http.Handler {
@@ -73,7 +78,7 @@ func decodeCommentHTTPRequest(_ context.Context, r *http.Request) (interface{}, 
 	id, idOK := vars["id"]
 
 	if !idOK {
-		return nil, errors.New("missing or wrong argument in request")
+		return nil, ErrWrongArgument
 	}
 	return endpoints.CommentRequest{
 		ID:     id,
@@ -90,16 +95,16 @@ func decodeCommentsHTTPRequest(_ context.Context, r *http.Request) (interface{},
 
 	pagenumber, err := strconv.Atoi(pn)
 	if err != nil {
-		return nil, errors.New("pagesize and pagenumber must be integer")
+		return nil, ErrNotInteger
 	}
 	pagesize, err := strconv.Atoi(ps)
 
 	if err != nil {
-		return nil, errors.New("pagesize and pagenumber must be integer")
+		return nil, ErrNotInteger
 	}
 
 	if !idOK || !pnOK || !psOK {
-		return nil, errors.New("missing or wrong argument in request")
+		return nil, ErrWrongArgument
 	}
 	return endpoints.CommentsRequest{
 		ID:         id,

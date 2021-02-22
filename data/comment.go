@@ -11,6 +11,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var (
+	ErrCommentNotFound = errors.New("comment not found")
+	ErrVoteFailed      = errors.New("vote failed!")
+)
+
 type Comment struct {
 	ID      string   `json:"id" `
 	PostID  string   `json:"postId" validate:"required"`
@@ -117,7 +122,7 @@ func Vote(ctx context.Context, userID string, commentID string) error {
 	pushToArray := bson.M{"$set": bson.M{"like": c.Like}}
 	result, err := collection.UpdateOne(ctx, filter, pushToArray)
 	if result.ModifiedCount <= 0 {
-		return errors.New("vote failed!")
+		return ErrVoteFailed
 	}
 	return err
 }
@@ -142,7 +147,7 @@ func DeleteComment(ctx context.Context, commentID string) error {
 	}
 
 	if res.ModifiedCount <= 0 {
-		return errors.New("comment not found")
+		return ErrCommentNotFound
 	}
 
 	return nil

@@ -10,6 +10,10 @@ import (
 	"github.com/go-kit/kit/log/level"
 )
 
+var (
+	ErrPermissionDenied = errors.New("User can not create comments for other users")
+)
+
 type service struct {
 	logger log.Logger
 }
@@ -80,7 +84,7 @@ func (s service) Add(ctx context.Context, userID string, newComment data.Comment
 		return err
 	}
 	if newComment.UserID != userID {
-		return errors.New("User can not create comments for other users")
+		return ErrPermissionDenied
 	}
 	return data.AddComment(ctx, newComment)
 }
@@ -98,7 +102,7 @@ func (s service) Delete(ctx context.Context, userID, commentID string) error {
 		return err
 	}
 	if userID != cmt.UserID {
-		return errors.New("User can not delete comments of other users")
+		return ErrPermissionDenied
 	}
 	return data.DeleteComment(ctx, commentID)
 }
