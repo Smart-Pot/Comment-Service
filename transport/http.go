@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
+	pkghttp "github.com/Smart-Pot/pkg/common/http"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/transport"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -65,7 +66,7 @@ func MakeHTTPHandlers(e endpoints.Endpoints, logger log.Logger) http.Handler {
 		options...,
 	))
 
-	return r
+	return pkghttp.EnableCORS(r)
 }
 
 func encodeHTTPResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {

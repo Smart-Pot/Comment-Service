@@ -3,7 +3,7 @@ module commentservice
 go 1.15
 
 require (
-	github.com/Smart-Pot/pkg v0.0.0-20210206200706-96dd342e9cb4
+	github.com/Smart-Pot/pkg v0.0.0-20210306154154-df79e3be0738
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-kit/kit v0.10.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
@@ -23,7 +23,7 @@ require (
 	go.mongodb.org/mongo-driver v1.4.6
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a // indirect
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
+	golang.org/x/sys v0.0.0-20210305230114-8fe3ee5dd75b // indirect
 	golang.org/x/text v0.3.5 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
