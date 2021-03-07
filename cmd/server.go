@@ -4,6 +4,7 @@ import (
 	"commentservice/endpoints"
 	"commentservice/service"
 	"commentservice/transport"
+	"fmt"
 	logg "log"
 	"net/http"
 	"os"
@@ -23,6 +24,8 @@ func startServer() error {
 	service := service.NewService(logger)
 	endpoint := endpoints.MakeEndpoints(service)
 	handler := transport.MakeHTTPHandlers(endpoint, logger)
+
+	fmt.Println("HELLO", pkg.Config.Server.Address)
 
 	l := logg.New(os.Stdout, "COMMENT-SERVICE", 0)
 	// Set handler and listen given port
