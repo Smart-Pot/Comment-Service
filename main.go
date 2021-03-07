@@ -16,7 +16,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println("Configurations are set")
-	if err := db.Connect(db.PkgConfig("users")); err != nil {
+	if err := db.Connect(db.PkgConfig("comments")); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("DB Connection established")
