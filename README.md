@@ -12,7 +12,7 @@ Comment{
 
 ## GetByUser
 
-- path: `/comment/user/{id}`
+- path: `/comment/user/{id}/{pagenumber}/{pagesize}`
 
 - returns:
     ```js
@@ -26,7 +26,7 @@ Comment{
 
 ## GetByPost
 
-- path : `/comment/post/{id}`
+- path : `/comment/post/{id}/{pagenumber}/{pagesize}`
 - method: `DELETE`
 - returns:
     ```js
